@@ -3,6 +3,17 @@ Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 [System.Windows.Forms.Application]::EnableVisualStyles()
 
+# ===================== DPI AWARENESS =====================
+Add-Type -TypeDefinition @"
+using System.Runtime.InteropServices;
+public class DpiHelper {
+    [DllImport("user32.dll")]
+    public static extern bool SetProcessDpiAwarenessContext(int value);
+}
+"@
+# DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 (-4) — sharpest on all monitors
+[DpiHelper]::SetProcessDpiAwarenessContext(-4) | Out-Null
+
 # ===================== Games =====================
 $commonIgnores = @(
   # Core

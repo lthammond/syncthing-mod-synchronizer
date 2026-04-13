@@ -16,7 +16,7 @@ jobs:
         shell: pwsh
         run: |
           Install-Module ps2exe -Force -Scope CurrentUser
-          Invoke-ps2exe .\SyncthingModSynchronizer.ps1 .\SyncthingModSynchronizer.exe -noConsole -STA -title "Syncthing Mod Synchronizer"
+          Invoke-ps2exe .\SyncthingModSynchronizer.ps1 .\SyncthingModSynchronizer.exe -noConsole -STA -DPIAware -title "Syncthing Mod Synchronizer"
 
       - name: Create release and upload exe
         uses: softprops/action-gh-release@v2
