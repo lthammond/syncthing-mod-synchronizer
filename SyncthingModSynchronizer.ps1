@@ -60,7 +60,7 @@ $ErrorActionPreference = 'Stop'
 $RemoteDeviceID   = 'IDIB5I7-HB4DODS-R3PMSZP-QNQLNAJ-E76GH6K-5FWFROC-VXJ2BOZ-J3ZIIAQ'
 $RemoteDeviceName = 'Server'
 $RemoteAddresses  = @('dynamic')
-$script:AppVersion = '1.0.0'
+$script:AppVersion = '1.0.3'
 $script:RepoSlug   = 'lthammond/syncthing-mod-synchronizer'
 
 # ===================== CORE FINDERS =====================
@@ -416,6 +416,10 @@ function AutoWire-RemoteDevice {
 }
 
 function Invoke-UpdateCheck {
+  # Skip update check when running as a ps1 directly (dev mode)
+  $selfPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+  if ($selfPath -match 'powershell\.exe$|pwsh\.exe$') { return }
+
   try {
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
     $rel    = Invoke-RestMethod "https://api.github.com/repos/$script:RepoSlug/releases/latest" -UseBasicParsing
@@ -480,6 +484,7 @@ function Refresh-SyncthingStatus {
     } else {
       $statusLines += "Syncthing: Not installed."
     }
+    $statusLines += "App version: v$script:AppVersion"
     $statusLines += ""
     $statusLines += "=================================="
     $statusLines += "Click a game's button to automatically find the path and prepare the .stignore file."
@@ -668,6 +673,7 @@ $writeBtn.Width = $buttonWidth
 $writeBtn.Height = 30
 $writeBtn.Top = 2
 $writeBtn.Anchor = "Top,Left"
+$writeBtn.Enabled = $false
 [void]$bottomBar.Controls.Add($writeBtn)
 
 # Path textbox (middle, stretches)
@@ -881,6 +887,7 @@ foreach ($g in $games) {
 
       $game = [hashtable]$sender.Tag
       $script:CurrentGame = $game
+      $writeBtn.Enabled = $true
 
       $found = Get-SteamGamePathsByName -NameLike $game.Name
 
@@ -907,6 +914,7 @@ foreach ($g in $games) {
       } else {
         $lines += "Syncthing: Not installed."
       }
+      $lines += "App version: v$script:AppVersion"
       $lines += ""
       $lines += "=================================="
 
